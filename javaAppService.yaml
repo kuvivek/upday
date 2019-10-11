@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Service
+metadata:
+  #creationTimestamp: "2019-10-11T11:23:07Z"
+  labels:
+    app: javaapp
+  name: javaapp
+  namespace: upday
+  #resourceVersion: "5978"
+  selfLink: /api/v1/namespaces/upday/services/javaapp
+  #uid: f4111ac4-52f4-4523-833a-c68e3fd0514b
+spec:
+  #clusterIP: 10.108.240.247
+  #externalTrafficPolicy: Cluster
+  ports:
+  - name: 80-8080
+    nodePort: 30080
+    port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    #app: javaapp
+    run: helloworldapp
+  #sessionAffinity: None
+  type: NodePort
+#status:
+  #loadBalancer: {}
+

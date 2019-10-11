@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: helloworldapp
+  name: helloworldapp
+  namespace: upday
+  #selfLink: /api/v1/namespaces/upday/pods/helloworldapp
+spec:
+  containers:
+  - image: kuvivek/upday_helloworld:1.0
+    #imagePullPolicy: IfNotPresent
+    imagePullPolicy: Always
+    name: helloworldapp
+  #nodeName: minikube
+  restartPolicy: Always
