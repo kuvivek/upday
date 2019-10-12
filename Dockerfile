@@ -11,7 +11,7 @@ RUN groupadd -g 999 appuser && \
     useradd -r -u 999 -g appuser appuser
 USER appuser
 
-WORKDIR /home/myuser
+WORKDIR /home/appuser
 
 COPY helloworld.jar .
 #RUN wget -q https://upday-interview-test.s3-eu-west-1.amazonaws.com/helloworld.jar
