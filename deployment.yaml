@@ -34,7 +34,7 @@ spec:
         run: helloworldapp
     spec:
       containers:
-      - image: kuvivek/upday_helloworld:1.0
+      - image: kuvivek/upday_helloworld:2.0
         #imagePullPolicy: IfNotPresent
         imagePullPolicy: Always
         name: upday-helloworld
