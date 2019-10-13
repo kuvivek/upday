@@ -1,19 +1,21 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: upday
+spec:
+  finalizers:
+  - kubernetes
+
+---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  #annotations:
-    #deployment.kubernetes.io/revision: "1"
-  #creationTimestamp: "2019-10-11T12:30:46Z"
-  #generation: 1
   labels:
     app: updayapp
   name: updayapp
   namespace: upday
-  #resourceVersion: "10794"
-  #selfLink: /apis/extensions/v1beta1/namespaces/upday/deployments/updayapp
-  #uid: 8398f8c0-bbab-4dc3-b989-606e3919a78b
 spec:
-  #progressDeadlineSeconds: 600
   #replicas: 1
   replicas: 2
   #revisionHistoryLimit: 10
@@ -28,7 +30,6 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-      #creationTimestamp: null
       labels:
         #app: updayapp
         run: helloworldapp
@@ -38,29 +39,51 @@ spec:
         #imagePullPolicy: IfNotPresent
         imagePullPolicy: Always
         name: upday-helloworld
-        #resources: {}
-        #terminationMessagePath: /dev/termination-log
-        #terminationMessagePolicy: File
-      #dnsPolicy: ClusterFirst
       restartPolicy: Always
-      #schedulerName: default-scheduler
-      #securityContext: {}
-      #terminationGracePeriodSeconds: 30
-#status:
-  #conditions:
-  #- lastTransitionTime: "2019-10-11T12:30:47Z"
-    #lastUpdateTime: "2019-10-11T12:30:47Z"
-    #message: Deployment does not have minimum availability.
-    #reason: MinimumReplicasUnavailable
-    #status: "False"
-    #type: Available
-  #- lastTransitionTime: "2019-10-11T12:30:47Z"
-    #lastUpdateTime: "2019-10-11T12:30:48Z"
-    #message: ReplicaSet "updayapp-5c586c498b" is progressing.
-    #reason: ReplicaSetUpdated
-    #status: "True"
-    #type: Progressing
-  #observedGeneration: 1
-  #replicas: 1
-  #unavailableReplicas: 1
-  #updatedReplicas: 1
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: javaapp
+  name: javaapp
+  namespace: upday
+spec:
+  ports:
+  - name: 80-8080
+    nodePort: 30080
+    port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    #app: javaapp
+    run: helloworldapp
+  type: NodePort
+
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: updayapp
+  namespace: upday
+spec:
+  maxReplicas: 10
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: updayapp
+  targetCPUUtilizationPercentage: 50
+
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: pdb_upday
+  namespace: upday
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      run: helloworldapp
