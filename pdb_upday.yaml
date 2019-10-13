@@ -1,0 +1,10 @@
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: pdb_upday
+  namespace: upday
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      run: helloworldapp
