@@ -495,3 +495,92 @@ replicaset.apps/updayapp-6455f4d7ff   2         2         2       24s
 
 [kuvivek@vivekcentos upday]$
 ```
+
+9. Creating the Horizontal Pod Autoscaling.
+
+```
+[kuvivek@vivekcentos upday]$ 
+[kuvivek@vivekcentos upday]$ kubectl autoscale deployment updayapp --cpu-percent=50 --min=1 --max=10 -n upday
+horizontalpodautoscaler.autoscaling/updayapp autoscaled
+[kuvivek@vivekcentos upday]$ 
+[kuvivek@vivekcentos upday]$ kubectl get all -n upday
+NAME                           READY   STATUS    RESTARTS   AGE
+pod/updayapp-8ffd77894-fgpsd   1/1     Running   0          4m54s
+pod/updayapp-8ffd77894-nvjmw   1/1     Running   0          4m54s
+
+
+
+
+NAME                       READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/updayapp   2/2     2            2           4m54s
+
+NAME                                 DESIRED   CURRENT   READY   AGE
+replicaset.apps/updayapp-8ffd77894   2         2         2       4m54s
+
+
+NAME                                           REFERENCE             TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+horizontalpodautoscaler.autoscaling/updayapp   Deployment/updayapp   <unknown>/50%   1         10        2          2m30s
+
+
+[kuvivek@vivekcentos upday]$ 
+[kuvivek@vivekcentos upday]$ 
+```
+
+Capturing the Configuration for the  Horizontal Pod AutoScaling, and storing only the relevant configuration in the 
+`hap_updayapp.yaml` file, as shown below.
+
+```
+[kuvivek@vivekcentos upday]$ 
+[kuvivek@vivekcentos upday]$ kubectl edit horizontalpodautoscaler updayapp -n upday
+Edit cancelled, no changes made.
+[kuvivek@vivekcentos upday]$ 
+[kuvivek@vivekcentos upday]$ vi hpa_updayapp.yaml 
+[kuvivek@vivekcentos upday]$ 
+```
+
+Similarly extracting namespace and only keeping the relevant content apturing the 
+
+```
+[kuvivek@vivekcentos upday]$ 
+[kuvivek@vivekcentos upday]$ kubectl edit namespace upday
+
+
+Press ENTER or type command to continue
+Edit cancelled, no changes made.
+[kuvivek@vivekcentos upday]$ vi namespace_upday.yaml 
+[kuvivek@vivekcentos upday]$ 
+```
+
+10. Creation of Pod Disruption Budget 
+
+Since the Pod disruption budget need manadtory parameter selector, It is required to add the same matchingLabels which were added in the deployment.yaml file.
+Here the selector label is `run=helloworlapp`. So the command to generate the 
+pod disruption budget is shown below.
+
+```
+[kuvivek@vivekcentos upday]$
+[kuvivek@vivekcentos upday]$ kubectl create poddisruptionbudget pdb_upday --selector run=helloworldapp --min-available=2 -n upday
+poddisruptionbudget.policy/pdb_upday created
+[kuvivek@vivekcentos upday]$
+[kuvivek@vivekcentos upday]$
+[kuvivek@vivekcentos upday]$ kubectl get poddisruptionbudget -n upday
+NAME        MIN AVAILABLE   MAX UNAVAILABLE   ALLOWED DISRUPTIONS   AGE
+pdb_upday   2               N/A               0                     17s
+[kuvivek@vivekcentos upday]$
+[kuvivek@vivekcentos upday]$
+```
+
+However, It is better to capture the relevant info into a configuration file.
+Either of these commands would suffice.
+
+```
+[kuvivek@vivekcentos upday]$
+[kuvivek@vivekcentos upday]$ kubectl edit poddisruptionbudget -n upday
+Edit cancelled, no changes made.
+[kuvivek@vivekcentos upday]$
+[kuvivek@vivekcentos upday]$ kubectl edit poddisruptionbudget pdb_upday -n upday
+Edit cancelled, no changes made.
+[kuvivek@vivekcentos upday]$
+```
+The current saved pdb_upday.yaml contains all the Pod Disruption Budget Minimum Available Configuration settings.
+

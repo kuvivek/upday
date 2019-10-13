@@ -7,6 +7,7 @@ MAINTAINER Vivek Kumar vivekkumar.bitsindri@gmail.com
 RUN apt-get update && apt-get install -y -q --no-install-recommends wget && apt-get clean \
  && rm -r /var/lib/apt/lists/*
 
+#Creating non-root user called appuser
 RUN groupadd -g 999 appuser && \
     useradd -r -u 999 -g appuser appuser
 USER appuser

@@ -7,7 +7,7 @@ metadata:
   name: javaapp
   namespace: upday
   #resourceVersion: "5978"
-  selfLink: /api/v1/namespaces/upday/services/javaapp
+  #selfLink: /api/v1/namespaces/upday/services/javaapp
   #uid: f4111ac4-52f4-4523-833a-c68e3fd0514b
 spec:
   #clusterIP: 10.108.240.247
