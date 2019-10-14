@@ -84,7 +84,8 @@ Successfully tagged kuvivek/upday/helloworld:1
 [kuvivek@vivekcentos upday]$
 
 ```
-
+Note: The fifth step is changed instead of downloading the jar file from S3 using wget. It is better to download the jar file locally.
+And then bundle it in the docker image. And It is bundled locally, there is no need of installing `wget`. As mentioned in Step 4.
 
 3. Run a Docker image to test the things are working fine or not.
 
@@ -108,11 +109,9 @@ Successfully tagged kuvivek/upday/helloworld:1
 
 ```
 
-
 4. Kill the above docker container and run it in the detached mode.
 If we look carefully the contextPath exposed by this REST API service is /actuator.
 We need to explore this by executing the curl commands.
-
 
 ```
 [kuvivek@vivekcentos upday]$
@@ -314,6 +313,7 @@ Edit cancelled, no changes made.
 Dockerfile  helloworld.jar  helloworldPod.yaml  javaAppService.yaml  README.md
 [kuvivek@vivekcentos upday]$
 ```
+
 8.8) Verifying the Pods and Services are running properly.
 ```
 [kuvivek@vivekcentos upday]$
@@ -347,9 +347,7 @@ Hello World from upday![kuvivek@vivekcentos upday]$
 [kuvivek@vivekcentos upday]$ curl http://192.168.39.154:30080/actuator
 {"_links":{"self":{"href":"http://192.168.39.154:30080/actuator","templated":false},"health-component":{"href":"http://192.168.39.154:30080/actuator/health/{component}","templated":true},"health-component-instance":{"href":"http://192.168.39.154:30080/actuator/health/{component}/{instance}","templated":true},"health":{"href":"http://192.168.39.154:30080/actuator/health","templated":false},"info":{"href":"http://192.168.39.154:30080/actuator/info","templated":false}}}[kuvivek@vivekcentos upday]$
 [kuvivek@vivekcentos upday]$
-
 ```
-
 
 8.9) Since creating Pod with the YAML file means the lifecycle of Pod needs to be maintained by us and not by Kubernetes.
 Incase the Pod dies due to heavy load, the Kubernetes kill these Pods and in order to make the application up and running
@@ -365,6 +363,7 @@ Creating Kubernetes Deployment manifest file through the command line option.
 The Deployment "updayapp" is invalid: spec.template.spec.containers[0].name: Invalid value: "upday_helloworld": a DNS-1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?')
 [kuvivek@vivekcentos upday]$
 ```
+
 Since the deployment manifest file creation through command does not support underscore `'_'` in image file.
 ```
 [kuvivek@vivekcentos upday]$
@@ -372,10 +371,10 @@ Since the deployment manifest file creation through command does not support und
 deployment.apps/updayapp created
 [kuvivek@vivekcentos upday]$
 ```
+
 It is advised to create the same using hyphen `'-'` and then copy the deployment manifest file through opening it in th edit mode.
 ```
 [kuvivek@vivekcentos upday]$ kubectl edit deployment updayapp -n upday
-
 
 Press ENTER or type command to continue
 Edit cancelled, no changes made.
@@ -471,6 +470,7 @@ replicaset.apps/updayapp-6455f4d7ff   2         2         0       7s
 
 [kuvivek@vivekcentos upday]$
 ```
+
 ContainerCreating stage in the Pod. Trying again after a few seconds.
 ```
 [kuvivek@vivekcentos upday]$ kubectl get all -n upday
@@ -497,7 +497,6 @@ replicaset.apps/updayapp-6455f4d7ff   2         2         2       24s
 ```
 
 9. Creating the Horizontal Pod Autoscaling.
-
 ```
 [kuvivek@vivekcentos upday]$ 
 [kuvivek@vivekcentos upday]$ kubectl autoscale deployment updayapp --cpu-percent=50 --min=1 --max=10 -n upday
@@ -528,7 +527,6 @@ horizontalpodautoscaler.autoscaling/updayapp   Deployment/updayapp   <unknown>/5
 
 Capturing the Configuration for the  Horizontal Pod AutoScaling, and storing only the relevant configuration in the 
 `hap_updayapp.yaml` file, as shown below.
-
 ```
 [kuvivek@vivekcentos upday]$ 
 [kuvivek@vivekcentos upday]$ kubectl edit horizontalpodautoscaler updayapp -n upday
@@ -539,7 +537,6 @@ Edit cancelled, no changes made.
 ```
 
 Similarly extracting namespace and only keeping the relevant content apturing the 
-
 ```
 [kuvivek@vivekcentos upday]$ 
 [kuvivek@vivekcentos upday]$ kubectl edit namespace upday
@@ -553,26 +550,21 @@ Edit cancelled, no changes made.
 
 10. Creation of Pod Disruption Budget 
 
-Since the Pod disruption budget need manadtory parameter selector, It is required to add the same matchingLabels which were added in the deployment.yaml file.
-Here the selector label is `run=helloworlapp`. So the command to generate the 
-pod disruption budget is shown below.
+Since the Pod disruption budget need mandatory parameter selector, It is required to add the same matchingLabels which were added in the deployment.yaml file. Here the selector label is `run=helloworlapp`. So the command to generate the pod disruption budget is shown below.
 
 ```
 [kuvivek@vivekcentos upday]$
 [kuvivek@vivekcentos upday]$ kubectl create poddisruptionbudget pdb_upday --selector run=helloworldapp --min-available=2 -n upday
 poddisruptionbudget.policy/pdb_upday created
 [kuvivek@vivekcentos upday]$
-[kuvivek@vivekcentos upday]$
 [kuvivek@vivekcentos upday]$ kubectl get poddisruptionbudget -n upday
 NAME        MIN AVAILABLE   MAX UNAVAILABLE   ALLOWED DISRUPTIONS   AGE
 pdb_upday   2               N/A               0                     17s
-[kuvivek@vivekcentos upday]$
 [kuvivek@vivekcentos upday]$
 ```
 
 However, It is better to capture the relevant info into a configuration file.
 Either of these commands would suffice.
-
 ```
 [kuvivek@vivekcentos upday]$
 [kuvivek@vivekcentos upday]$ kubectl edit poddisruptionbudget -n upday
@@ -582,5 +574,5 @@ Edit cancelled, no changes made.
 Edit cancelled, no changes made.
 [kuvivek@vivekcentos upday]$
 ```
-The current saved pdb_upday.yaml contains all the Pod Disruption Budget Minimum Available Configuration settings.
 
+The current saved pdb_upday.yaml contains all the Pod Disruption Budget Minimum Available Configuration settings.
